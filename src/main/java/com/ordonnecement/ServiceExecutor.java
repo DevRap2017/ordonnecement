@@ -5,18 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public record Process(int pid, int start, int time) {
+public class ServiceExecutor {
 
-    public Process execute() {
-        if (!isDone()) {
-            return new Process(pid, start, time - 1);
-        }
-        return null;
-    }
-
-    public boolean isDone() {
-        return time <= 0;
-    }
 
     public List<Process> run(List<Process> processes) {
         AtomicInteger start = new AtomicInteger(0);
@@ -27,15 +17,20 @@ public record Process(int pid, int start, int time) {
 
                 for (Process process : availableProcesses) {
                     Process process1 = process;
+                    final int pid = process1.pid();
                     while (!process1.isDone()) {
                         process1 = process1.execute();
                     }
-                    exectuedProcess.add(process1);
+
+                    if(!exectuedProcess.stream().anyMatch(process2->process2.pid()==pid))
+                    exectuedProcess.add(process);
                 }
+                start.getAndIncrement();
             } else {
                 start.getAndIncrement();
             }
         });
+        exectuedProcess.forEach(process -> System.out.println(process.format()));
 
         return exectuedProcess;
     }
@@ -44,18 +39,12 @@ public record Process(int pid, int start, int time) {
 
         List<Process> availablesProcesses = new ArrayList<>();
 
-            for (Process process : processes) {
-                if (process.start() <= start && !process.isDone()) {
-                    availablesProcesses.add(process);
-                }
+        for (Process process : processes) {
+            if (process.start() <= start && !process.isDone()) {
+                availablesProcesses.add(process);
+            }
         }
-        availablesProcesses.sort(Comparator.comparing(p -> p.time));
+        availablesProcesses.sort(Comparator.comparing(p -> p.time()));
         return availablesProcesses;
     }
-
-    public String format(){
-        return "{pid:"+pid+", start: "+start+", time: "+time+"}";
-    }
 }
-
-
