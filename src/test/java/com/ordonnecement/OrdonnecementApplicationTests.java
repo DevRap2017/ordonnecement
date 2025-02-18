@@ -17,9 +17,20 @@ class OrdonnecementApplicationTests {
       //Given
      Process process = new Process(1,0,1);
      //WHEN
-		Process result = process.execute();
+		Process result = process.run(process);
     // THEN
-		Assertions.assertEquals(0,result.time());
+		Assertions.assertTrue(result.isDone());
 	}
+
+	@Test
+	public void testExecuteOneCycleTwoTimeProcess(){
+		//Given
+		Process process = new Process(1,0,1);
+		//WHEN
+		Process result = process.run(process);
+		// THEN
+		Assertions.assertTrue(result.isDone());
+	}
+
 
 }
