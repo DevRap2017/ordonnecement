@@ -48,8 +48,10 @@ class OrdonnecementApplicationTests {
 		ServiceExecutor serviceExecutor = new ServiceExecutor();
 
 		//WHEN
-		 serviceExecutor.run(processes);
+		List<Process> result = serviceExecutor.run(processes);
 		//THEN
+
+		Assertions.assertEquals(4,result.get(0).pid());
 
 	}
 
